@@ -200,6 +200,7 @@ nohup.out
 *.swo
 /conan_provider.cmake
 /conandata.yml
+vcpkg_installed/
 
 # Cristiano files
 MIEI

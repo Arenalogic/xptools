@@ -23,7 +23,7 @@ target_compile_definitions(DDSTool PRIVATE
 )
 
 target_link_libraries(DDSTool PRIVATE
-	libsquish::libsquish
+	unofficial::libsquish::squish
 	TIFF::TIFF
 	JPEG::JPEG
 	PNG::PNG

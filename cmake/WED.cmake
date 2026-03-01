@@ -481,6 +481,7 @@ endif()
 target_include_directories(WED PRIVATE
 	src/lzma19/C
 	SDK/libtess2/Include
+	${GEOTIFF_INCLUDE_DIR}
 	src/WEDTCE
 	src/DSF
 	src/DSFTools
@@ -520,12 +521,13 @@ target_link_libraries(WED PRIVATE
 	PROJ::proj
 	Freetype::Freetype
 	TIFF::TIFF
-	geotiff_library
+	${GEOTIFF_LIBRARIES}
 	JPEG::JPEG
-	libsquish::libsquish
+	unofficial::libsquish::squish
 	CURL::libcurl
-	opengl::opengl
-	GLEW::glew_s
+	OpenGL::GL
+	OpenGL::GLU
+	GLEW::GLEW
 	JsonCpp::JsonCpp
 )
 

@@ -428,6 +428,14 @@ int GUI_FitForward(int inFontID, const char* inStart, const char* inEnd,float wi
 	return (const char *) p - inStart;
 }
 
+int GUI_FitForward(int inFontID, std::string::const_iterator inStart, std::string::const_iterator inEnd, float width)
+{
+	if (inStart == inEnd) return 0;
+	const char* start = &(*inStart);
+	const char* end = start + std::distance(inStart, inEnd);
+	return GUI_FitForward(inFontID, start, end, width);
+}
+
 int GUI_FitReverse(int inFontID, const char* inStart, const char* inEnd,float width)
 {
 	if(inStart == inEnd) return 0;

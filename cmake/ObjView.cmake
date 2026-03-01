@@ -67,9 +67,10 @@ target_link_libraries(ObjView PRIVATE
 	PNG::PNG
 	TIFF::TIFF
 	JPEG::JPEG
-	libsquish::libsquish
-	opengl::opengl
-	GLEW::glew_s
+	unofficial::libsquish::squish
+	OpenGL::GL
+	OpenGL::GLU
+	GLEW::GLEW
 )
 
 target_include_directories(ObjView PRIVATE
