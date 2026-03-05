@@ -341,7 +341,7 @@ int			WED_ToolInfoAdapter::GetCellWidth(int n)
 	default:				return 50;
 	}
 	else
-		return GUI_MeasureRange(OUR_FONT, &*inf.prop_name.begin(), &*inf.prop_name.end()) + 18;
+		return GUI_MeasureRange(OUR_FONT, inf.prop_name.c_str(), inf.prop_name.c_str() + inf.prop_name.size()) + 18;
 }
 
 int			WED_ToolInfoAdapter::GetCellBottom(int n)

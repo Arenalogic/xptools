@@ -458,6 +458,9 @@ vector<navaid_t>::const_iterator WED_NavaidLayer::navaid_list::cbegin(double lon
 		best_begin = nav_list.size() / 2;
 	}
 
+	if (nav_list.empty())
+		return nav_list.cend();
+
 	if (longitude > nav_list[best_begin].lonlat.x())
 	{
 		while (best_begin < nav_list.size()-1 && longitude > nav_list[best_begin + 1].lonlat.x())
