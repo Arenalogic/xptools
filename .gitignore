@@ -205,3 +205,4 @@ vcpkg_installed/
 # Cristiano files
 MIEI
 /vs_build
+/.claude/settings.local.json
