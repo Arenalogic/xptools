@@ -638,6 +638,7 @@ static hierarchy_order_set build_order_set()
 	//an enum + dictionary solution that is more type safe
 	//"/" is like a dir seperator
 	h_set.insert("/ATC");
+	h_set.insert("/Cables");
 	h_set.insert("/Ground Vehicles");
 //	h_set.insert("/Ground Vehicles/Dynamic");
 //	h_set.insert("/Ground Vehicles/Static");

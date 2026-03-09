@@ -51,6 +51,7 @@
 	_R(WED_AirportBeacon) \
 	_R(WED_AirportBoundary) \
 	_R(WED_AirportChain) \
+	_R(WED_ArresterCable) \
 	_R(WED_Ring) \
 	_R(WED_AirportNode) \
 	_R(WED_AirportSign) \
