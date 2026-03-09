@@ -106,6 +106,9 @@ enum {
 	apt_jetway = 1500,					// 1500 lat lon install_heading style_code size_code parked_tunnel_heading parked_tunnel_length parked_cab_heading
 	apt_jetway_custom = 1501,			// specifies custom path/vpath to be used for last preceeding 1500 jetway
 
+	// ACT extension records (2000+)
+	apt_act_arrester = 2000,			// 2000 <cable_type> <runway_id> — arrester cable header, followed by node records
+
 	// Surface codes
 	apt_surf_none		= 0,
 	apt_surf_asphalt,
@@ -644,6 +647,13 @@ struct Jetway_t {
 };
 typedef vector<Jetway_t> JetwayVector;
 
+struct AptArresterCable_t {
+	string						cable_type;		// BAK-12, BAK-14, BAK-15
+	string						runway_id;		// e.g. RW05R
+	AptPolygon_t				geometry;		// chain of node records (111-116) for cable path
+};
+typedef vector<AptArresterCable_t> AptArresterCableVector;
+
 struct AptInfo_t {
 	int					kind_code;				// Enum
 	string				icao;
@@ -668,6 +678,8 @@ struct AptInfo_t {
 	AptTruckParkingVector		truck_parking;
 	AptTruckDestinationVector	truck_destinations;
 	JetwayVector				jetways;
+
+	AptArresterCableVector		arrester_cables;	// ACT extension
 
 	AptTowerPt_t		tower;
 	AptBeacon_t			beacon;

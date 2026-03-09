@@ -68,6 +68,7 @@ set (WED_SOURCES
 	src/WEDEntities/WED_Airport.cpp
 	src/WEDEntities/WED_AirportNode.cpp
 	src/WEDEntities/WED_AirportSign.cpp
+	src/WEDEntities/WED_ArresterCable.cpp
 	src/WEDEntities/WED_AutogenPlacement.cpp
 	src/WEDEntities/WED_AutogenNode.cpp
 	src/WEDEntities/WED_ATCFlow.cpp

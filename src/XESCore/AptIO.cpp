@@ -1182,6 +1182,21 @@ string	ReadAptFileMem(const char * inBegin, const char * inEnd, AptVector& outAp
 				}
 			}
 			break;
+		case apt_act_arrester:
+			if (outApts.empty()) ok = "Error: arrester cable outside an airport.";
+			else
+			{
+				outApts.back().arrester_cables.push_back(AptArresterCable_t());
+				if (TextScanner_FormatScan(s, "iTT|",
+					&rec_code,
+					&outApts.back().arrester_cables.back().cable_type,
+					&outApts.back().arrester_cables.back().runway_id) < 3)
+				{
+					ok = "Error: Illegal arrester cable record";
+				}
+				open_poly = &outApts.back().arrester_cables.back().geometry;
+			}
+			break;
 		case apt_done:
 			forceDone = true;
 			break;
@@ -1205,6 +1220,9 @@ string	ReadAptFileMem(const char * inBegin, const char * inEnd, AptVector& outAp
 				{
 					outApts.back().atc.back().atc_type -= apt_freq_awos_1k-apt_freq_awos;    // adjust new style codes to internally use "old" types - to match the enum definitions
 				}
+			} else if (rec_code >= 2000)
+			{
+				// Gracefully skip unknown ACT extension records
 			} else
 				ok = "Illegal unknown record";
 			break;
@@ -1260,6 +1278,14 @@ string	ReadAptFileMem(const char * inBegin, const char * inEnd, AptVector& outAp
 
 		for(AptBoundaryVector::iterator b = a->boundaries.begin(); b != a->boundaries.end(); ++b)
 		for(AptPolygon_t::iterator pt = b->area.begin(); pt != b->area.end(); ++pt)
+		{
+			a->bounds +=  pt->pt;
+			if(pt->code == apt_lin_crv || pt->code == apt_rng_crv || pt-> code == apt_end_crv)
+				a->bounds +=  pt->ctrl;
+		}
+
+		for(AptArresterCableVector::iterator c = a->arrester_cables.begin(); c != a->arrester_cables.end(); ++c)
+		for(AptPolygon_t::iterator pt = c->geometry.begin(); pt != c->geometry.end(); ++pt)
 		{
 			a->bounds +=  pt->pt;
 			if(pt->code == apt_lin_crv || pt->code == apt_rng_crv || pt-> code == apt_end_crv)
@@ -1662,6 +1688,13 @@ bool	WriteAptFileProcs(int (* fprintf)(void * fi, const char * fmt, ...), void *
 						fprintf(fi, "%d %s" CRLF,
 							apt_jetway_custom, jetway.vpath.c_str());
 				}
+
+			for (auto const& cable : apt->arrester_cables)
+			{
+				fprintf(fi, "%d %s %s" CRLF,
+					apt_act_arrester, cable.cable_type.c_str(), cable.runway_id.c_str());
+				print_apt_poly(fprintf, fi, cable.geometry, version);
+			}
 		}
 	}
 	fprintf(fi, "%d" CRLF, apt_done);

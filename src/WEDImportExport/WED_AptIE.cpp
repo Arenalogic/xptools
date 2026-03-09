@@ -26,6 +26,7 @@
 #include "WED_Globals.h"
 #include "WED_Airport.h"
 #include "WED_AirportBeacon.h"
+#include "WED_ArresterCable.h"
 #include "WED_AirportBoundary.h"
 #include "WED_AirportChain.h"
 #include "WED_AirportNode.h"
@@ -127,7 +128,7 @@ inline	void	accum(AptPolygon_t& poly, int code, const Point2& pt, const Point2& 
 inline bool is_curved(int code) { return code == apt_lin_crv || code == apt_rng_crv ||  code == apt_end_crv; }
 
 
-static void ExportLinearPath(WED_AirportChain * chain, AptPolygon_t& poly)
+static void ExportLinearPath(WED_GISChain * chain, AptPolygon_t& poly)
 {
 	int n = chain->GetNumPoints();
 	poly.reserve(poly.size() + n);     // may need more (bezier handles), but its a good start
@@ -318,6 +319,17 @@ void	AptExportRecursive(WED_Thing * what, AptVector& apts, vector<WED_TaxiRoute 
 		cha->Export(apts.back().lines.back());
 		ExportLinearPath(cha, apts.back().lines.back().area);
 		return;	// don't waste time with nodes - for speed
+	}
+	else if (cls == WED_ArresterCable::sClass)
+	{
+		if (gExportTarget == wet_act)
+		{
+			auto cab = static_cast<WED_ArresterCable *>(what);
+			apts.back().arrester_cables.push_back(AptArresterCable_t());
+			cab->Export(apts.back().arrester_cables.back());
+			ExportLinearPath(cab, apts.back().arrester_cables.back().geometry);
+		}
+		return;	// don't recurse into nodes
 	}
 	else if (cls == WED_AirportSign::sClass)
 	{
@@ -733,6 +745,7 @@ void	WED_AptImport(
 			out_airports->push_back(new_apt);
 
 		create_buckets(new_apt, "ATC",                          buckets);
+		create_buckets(new_apt, "Cables",                       buckets);
 		create_buckets(new_apt, "Ground Vehicles",              buckets);
 		create_buckets(new_apt, "Lights",                       buckets);
 		create_buckets(new_apt, "Jetways",                      buckets);
@@ -912,6 +925,21 @@ void	WED_AptImport(
 			auto new_fac = WED_FacadePlacement::CreateTyped(archive);
 			new_fac->ImportJetway(dst, LazyPrintf, &log);
 			add_to_bucket(new_fac, new_apt, "Jetways", buckets);
+		}
+
+		for (auto& cable : apt->arrester_cables)
+		{
+			WED_ArresterCable * new_cab = WED_ArresterCable::CreateTyped(archive);
+			add_to_bucket(new_cab, new_apt, "Cables", buckets);
+			new_cab->Import(cable, LazyPrintf, &log);
+			string cable_name = cable.cable_type + " " + cable.runway_id;
+			new_cab->SetName(cable_name);
+
+			if (!ImportLinearPath(cable.geometry, archive, new_cab, NULL, LazyPrintf, &log))
+			{
+				new_cab->SetParent(NULL, 0);
+				new_cab->Delete();
+			}
 		}
 
 		if(apt_ok)
