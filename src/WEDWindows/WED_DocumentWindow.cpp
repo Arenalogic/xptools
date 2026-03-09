@@ -305,6 +305,8 @@ WED_DocumentWindow::WED_DocumentWindow(
 	gExportTarget = wet_latest_xplane;
 #else
 	gExportTarget = (WED_Export_Target) inDocument->ReadIntPref("doc/export_target",gExportTarget);
+	if (gExportTarget > wet_latest_xplane && gExportTarget != wet_gateway && gExportTarget != wet_act)
+		gExportTarget = wet_latest_xplane;
 #endif
 
 	int wedXMLversion = inDocument->ReadIntPref("doc/xml_compatibility",0);
@@ -509,6 +511,7 @@ int	WED_DocumentWindow::HandleCommand(int command)
 			Refresh();
 		}
 		return 1;
+	case wed_ExportACT:    if (gExportTarget != wet_act)     { gExportTarget = wet_act;     mDocument->SetDirty(); Refresh(); } return 1;
 	case wed_ExportGateway:if (gExportTarget != wet_gateway) { gExportTarget = wet_gateway; mDocument->SetDirty(); Refresh(); } return 1;
 
 #if WITHNWLINK
@@ -642,6 +645,7 @@ int	WED_DocumentWindow::CanHandleCommand(int command, string& ioName, int& ioChe
 	case wed_Export1100: case wed_Export1130:
 	case wed_Export1200: case wed_Export1212:
 		ioCheck = (command - wed_Export900) == (gExportTarget - wet_xplane_900); return 1;
+	case wed_ExportACT:    ioCheck = gExportTarget == wet_act;     return 1;
 	case wed_ExportGateway:ioCheck = gExportTarget == wet_gateway;	return 1;
 
 #if WITHNWLINK
@@ -715,7 +719,7 @@ void	WED_DocumentWindow::ReceiveMessage(
 		gExportTarget = wet_latest_xplane;
 	#else
 		gExportTarget = (WED_Export_Target) mDocument->ReadIntPref("doc/export_target",gExportTarget);
-		if (gExportTarget > wet_latest_xplane && gExportTarget != wet_gateway)
+		if (gExportTarget > wet_latest_xplane && gExportTarget != wet_gateway && gExportTarget != wet_act)
 			gExportTarget = wet_latest_xplane;
 	#endif
 		XWin::SetFilePath(NULL,mDocument->IsDirty());

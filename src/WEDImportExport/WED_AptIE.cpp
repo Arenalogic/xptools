@@ -23,6 +23,7 @@
 
 #include "WED_AptImportDialog.h"
 
+#include "WED_Globals.h"
 #include "WED_Airport.h"
 #include "WED_AirportBeacon.h"
 #include "WED_AirportBoundary.h"
@@ -101,6 +102,9 @@ static int get_apt_export_version()
 		break;
 	case wet_xplane_1200:
 	case wet_xplane_1212:
+		version = 1200;
+		break;
+	case wet_act:
 		version = 1200;
 		break;
 	default:
@@ -461,11 +465,21 @@ void	AptExportRecursive(WED_Thing * what, AptVector& apts, vector<WED_TaxiRoute 
 	}
 }
 
+static void inject_act_metadata(AptVector& apts)
+{
+	if (gExportTarget == wet_act)
+	{
+		for (auto& apt : apts)
+			apt.meta_data.push_back(std::pair<string,string>("act_version", "1"));
+	}
+}
+
 void	WED_AptExport(WED_Thing * container, const char * file_path, bool DockingJetways)
 {
 	AptVector	apts;
 	vector<WED_TaxiRoute *> edges;
 	AptExportRecursive(container, apts, edges, DockingJetways);
+	inject_act_metadata(apts);
 	WriteAptFile(file_path,apts, get_apt_export_version());
 }
 
@@ -477,6 +491,7 @@ void	WED_AptExport(
 	AptVector	apts;
 	vector<WED_TaxiRoute *> edges;
 	AptExportRecursive(container, apts, edges, true);
+	inject_act_metadata(apts);
 	WriteAptFileProcs(print_func, ref, apts, get_apt_export_version());
 }
 
