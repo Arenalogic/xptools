@@ -29,11 +29,14 @@
 #include "ISelection.h"
 #include "WED_EnumSystem.h"
 #include "WED_RunwayNode.h"
+#include "WED_AirportNode.h"
+#include "WED_ArresterCable.h"
+#include "AptDefs.h"
 #include "WED_Sealane.h"
 #include "XESConstants.h"
 #include "GISUtils.h"
 static const char * kCreateCmds[] = {
-	"Runway", "Sealane"
+	"Runway", "Sealane", "Arrester Cable"
 };
 
 WED_CreateLineTool::WED_CreateLineTool(
@@ -62,7 +65,9 @@ WED_CreateLineTool::WED_CreateLineTool(
 		rwy_app_lights		(tool==create_Runway	?this:NULL,PROP_Name("Appch",	 XML_Name("","")),Light_App,		app_MALSF),
 		rwy_tdzl			(tool==create_Runway	?this:NULL,PROP_Name("TDZL",	 XML_Name("","")),0),
 		rwy_reil			(tool==create_Runway	?this:NULL,PROP_Name("REIL",	 XML_Name("","")),REIL_Lights,		reil_None),
-		sea_buoys			(tool==create_Sealane	?this:NULL,PROP_Name("Buoys",	 XML_Name("","")),1)
+		sea_buoys			(tool==create_Sealane	?this:NULL,PROP_Name("Buoys",	 XML_Name("","")),1),
+		cable_type			(tool==create_Cable		?this:NULL,PROP_Name("Cable Type",XML_Name("","")), "BAK-12"),
+		cable_runway		(tool==create_Cable		?this:NULL,PROP_Name("Runway ID", XML_Name("","")), "")
 {
 }
 
@@ -86,6 +91,40 @@ void	WED_CreateLineTool::AcceptPath(
 
 	int idx;
 	WED_Thing * host = WED_GetCreateHost(GetResolver(), true, true, idx);
+
+	// Cable is a WED_GISChain, not a WED_GISLine_Width — handle separately
+	if (mType == create_Cable)
+	{
+		static int cn = 0;
+		++cn;
+
+		WED_ArresterCable * cab = WED_ArresterCable::CreateTyped(GetArchive());
+		WED_AirportNode * n1 = WED_AirportNode::CreateTyped(GetArchive());
+		WED_AirportNode * n2 = WED_AirportNode::CreateTyped(GetArchive());
+		n1->SetParent(cab, 0);
+		n2->SetParent(cab, 1);
+		n1->SetLocation(gis_Geo, pts[0]);
+		n2->SetLocation(gis_Geo, pts[1]);
+		n1->SetName("Cable Start");
+		n2->SetName("Cable End");
+
+		cab->SetParent(host, idx);
+		sprintf(buf, "%s %s", cable_type.value.c_str(), cable_runway.value.c_str());
+		cab->SetName(buf);
+
+		// Apply tool properties to the entity
+		AptArresterCable_t apt_cab;
+		apt_cab.cable_type = cable_type.value;
+		apt_cab.runway_id = cable_runway.value;
+		cab->Import(apt_cab, NULL, NULL);
+
+		ISelection * sel = WED_GetSelect(GetResolver());
+		sel->Clear();
+		sel->Select(cab);
+
+		GetArchive()->CommitCommand();
+		return;
+	}
 
 	WED_GISLine_Width * obj = NULL;
 

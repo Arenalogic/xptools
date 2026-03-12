@@ -219,7 +219,7 @@ WED_MapPane::WED_MapPane(GUI_Commander * cmdr, double map_bounds[4], IResolver *
 	mTools.push_back(					new WED_CreatePolygonTool("Taxiway",mMap, mMap, resolver, archive, create_Taxi));
 
 	mTools.push_back(					new WED_CreateLineTool("Runway", mMap, mMap, resolver, archive, create_Runway));
-	mTools.push_back(					new WED_CreateLineTool("Sealane", mMap, mMap, resolver, archive, create_Sealane));
+	mTools.push_back(					new WED_CreateLineTool("Arrester Cable", mMap, mMap, resolver, archive, create_Cable));
 
 	mTools.push_back(					new WED_VertexTool("Vertex",mMap, mMap, resolver, 1));
 	mTools.push_back(					new WED_MarqueeTool("Marquee",mMap, mMap, resolver));

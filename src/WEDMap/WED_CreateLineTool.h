@@ -28,7 +28,8 @@
 
 enum CreateLine_t {
 	create_Runway = 0,
-	create_Sealane
+	create_Sealane,
+	create_Cable		// ACT: Arrester cable (2-point line across runway)
 };
 
 class WED_CreateLineTool : public WED_CreateToolBase {
@@ -63,6 +64,9 @@ protected:
 		WED_PropIntEnum				rwy_reil;
 
 		WED_PropBoolText			sea_buoys;
+
+		WED_PropStringText			cable_type;		// ACT: BAK-12, BAK-14, BAK-15
+		WED_PropStringText			cable_runway;	// ACT: e.g. RW05R
 
 	virtual	void		AcceptPath(
 							const vector<Point2>&	pts,

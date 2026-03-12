@@ -936,7 +936,19 @@ void	WED_AptImport(
 			string cable_name = cable.cable_type + " " + cable.runway_id;
 			new_cab->SetName(cable_name);
 
-			if (!ImportLinearPath(cable.geometry, archive, new_cab, NULL, LazyPrintf, &log))
+			// WED_ArresterCable IS a WED_GISChain, so nodes must be direct
+			// children (not wrapped in an intermediary WED_AirportChain as
+			// ImportLinearPath would create).
+			for (auto cur = cable.geometry.begin(); cur != cable.geometry.end(); ++cur)
+			{
+				WED_AirportNode * n = WED_AirportNode::CreateTyped(archive);
+				n->SetParent(new_cab, new_cab->CountChildren());
+				n->SetLocation(gis_Geo, cur->pt);
+				if (is_curved(cur->code))
+					n->SetControlHandleHi(gis_Geo, cur->ctrl);
+			}
+
+			if (new_cab->GetNumPoints() < 2)
 			{
 				new_cab->SetParent(NULL, 0);
 				new_cab->Delete();
