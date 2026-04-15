@@ -650,6 +650,7 @@ typedef vector<Jetway_t> JetwayVector;
 struct AptArresterCable_t {
 	string						cable_type;		// BAK-12, BAK-14, BAK-15
 	string						runway_id;		// e.g. RW05R
+	int							always_raised;	// 0 = instructor-controllable (default), 1 = permanently raised, no CC control
 	AptPolygon_t				geometry;		// chain of node records (111-116) for cable path
 };
 typedef vector<AptArresterCable_t> AptArresterCableVector;

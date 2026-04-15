@@ -1187,10 +1187,12 @@ string	ReadAptFileMem(const char * inBegin, const char * inEnd, AptVector& outAp
 			else
 			{
 				outApts.back().arrester_cables.push_back(AptArresterCable_t());
-				if (TextScanner_FormatScan(s, "iTT|",
+				// always_raised is an optional 4th column; absence => 0 (instructor-controllable, legacy behavior)
+				if (TextScanner_FormatScan(s, "iTTi|",
 					&rec_code,
 					&outApts.back().arrester_cables.back().cable_type,
-					&outApts.back().arrester_cables.back().runway_id) < 3)
+					&outApts.back().arrester_cables.back().runway_id,
+					&outApts.back().arrester_cables.back().always_raised) < 3)
 				{
 					ok = "Error: Illegal arrester cable record";
 				}
@@ -1691,8 +1693,8 @@ bool	WriteAptFileProcs(int (* fprintf)(void * fi, const char * fmt, ...), void *
 
 			for (auto const& cable : apt->arrester_cables)
 			{
-				fprintf(fi, "%d %s %s" CRLF,
-					apt_act_arrester, cable.cable_type.c_str(), cable.runway_id.c_str());
+				fprintf(fi, "%d %s %s %d" CRLF,
+					apt_act_arrester, cable.cable_type.c_str(), cable.runway_id.c_str(), cable.always_raised);
 				print_apt_poly(fprintf, fi, cable.geometry, version);
 			}
 		}

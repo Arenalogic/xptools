@@ -29,8 +29,9 @@
 DEFINE_PERSISTENT(WED_ArresterCable)
 
 WED_ArresterCable::WED_ArresterCable(WED_Archive * a, int i) : WED_GISChain(a,i),
-	cable_type(this,PROP_Name("Cable Type", XML_Name("arrester_cable","cable_type")), "BAK-12"),
-	runway_id (this,PROP_Name("Runway ID",  XML_Name("arrester_cable","runway_id")),  "")
+	cable_type    (this,PROP_Name("Cable Type",     XML_Name("arrester_cable","cable_type")),     "BAK-12"),
+	runway_id     (this,PROP_Name("Runway ID",      XML_Name("arrester_cable","runway_id")),      ""),
+	always_raised (this,PROP_Name("Always Raised",  XML_Name("arrester_cable","always_raised")),  0)
 {
 }
 
@@ -42,8 +43,9 @@ void WED_ArresterCable::CopyFrom(const WED_ArresterCable * rhs)
 {
 	WED_GISChain::CopyFrom(rhs);
 	StateChanged();
-	cable_type.value = rhs->cable_type.value;
-	runway_id.value  = rhs->runway_id.value;
+	cable_type.value    = rhs->cable_type.value;
+	runway_id.value     = rhs->runway_id.value;
+	always_raised.value = rhs->always_raised.value;
 }
 
 bool WED_ArresterCable::ReadFrom(IOReader * reader)
@@ -51,6 +53,7 @@ bool WED_ArresterCable::ReadFrom(IOReader * reader)
 	bool r = WED_GISChain::ReadFrom(reader);
 	cable_type.ReadFrom(reader);
 	runway_id.ReadFrom(reader);
+	always_raised.ReadFrom(reader);
 	return r;
 }
 
@@ -59,13 +62,15 @@ void WED_ArresterCable::WriteTo(IOWriter * writer)
 	WED_GISChain::WriteTo(writer);
 	cable_type.WriteTo(writer);
 	runway_id.WriteTo(writer);
+	always_raised.WriteTo(writer);
 }
 
 void	WED_ArresterCable::AddExtraXML(WED_XMLElement * obj)
 {
 	WED_XMLElement * xml = obj->add_sub_element("arrester_cable");
-	xml->add_attr_c_str("cable_type", cable_type.value.c_str());
-	xml->add_attr_c_str("runway_id",  runway_id.value.c_str());
+	xml->add_attr_c_str("cable_type",    cable_type.value.c_str());
+	xml->add_attr_c_str("runway_id",     runway_id.value.c_str());
+	xml->add_attr_int  ("always_raised", always_raised.value);
 }
 
 void	WED_ArresterCable::StartElement(
@@ -80,6 +85,9 @@ void	WED_ArresterCable::StartElement(
 
 		const XML_Char * ri = get_att("runway_id",atts);
 		if(ri) runway_id.value = ri;
+
+		const XML_Char * ar = get_att("always_raised",atts);
+		if(ar) always_raised.value = atoi(ar);
 	}
 	else
 		WED_GISChain::StartElement(reader,name,atts);
@@ -91,12 +99,14 @@ void	WED_ArresterCable::PopHandler(void) { }
 
 void	WED_ArresterCable::Import(const AptArresterCable_t& x, void (* print_func)(void *, const char *, ...), void * ref)
 {
-	cable_type.value = x.cable_type;
-	runway_id.value  = x.runway_id;
+	cable_type.value    = x.cable_type;
+	runway_id.value     = x.runway_id;
+	always_raised.value = x.always_raised;
 }
 
 void	WED_ArresterCable::Export(AptArresterCable_t& x) const
 {
-	x.cable_type = cable_type.value;
-	x.runway_id  = runway_id.value;
+	x.cable_type    = cable_type.value;
+	x.runway_id     = runway_id.value;
+	x.always_raised = always_raised.value;
 }

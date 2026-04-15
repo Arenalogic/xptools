@@ -62,6 +62,7 @@ private:
 
 	WED_PropStringText		cable_type;		// BAK-12, BAK-14, BAK-15
 	WED_PropStringText		runway_id;		// e.g. RW05R
+	WED_PropBoolText		always_raised;	// true = permanently raised, no instructor control in CommandCentral
 
 };
 
