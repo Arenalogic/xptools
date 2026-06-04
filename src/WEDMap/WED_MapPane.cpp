@@ -174,7 +174,9 @@ WED_MapPane::WED_MapPane(GUI_Commander * cmdr, double map_bounds[4], IResolver *
 	}
 #endif
 	// TOOLS
-	mTools.push_back(					NULL);
+	// ACT: Arrester Cable lives in this (formerly empty) first slot so it gets its own
+	// dedicated toolbar icon instead of borrowing the Sealane cell. See SetTool(NULL) below.
+	mTools.push_back(					new WED_CreateLineTool("Arrester Cable", mMap, mMap, resolver, archive, create_Cable));
 	mTools.push_back(					new WED_CreatePolygonTool("Shapes", mMap, mMap, resolver, archive, create_Shape));
 
 #if ROAD_EDITING
@@ -219,7 +221,7 @@ WED_MapPane::WED_MapPane(GUI_Commander * cmdr, double map_bounds[4], IResolver *
 	mTools.push_back(					new WED_CreatePolygonTool("Taxiway",mMap, mMap, resolver, archive, create_Taxi));
 
 	mTools.push_back(					new WED_CreateLineTool("Runway", mMap, mMap, resolver, archive, create_Runway));
-	mTools.push_back(					new WED_CreateLineTool("Arrester Cable", mMap, mMap, resolver, archive, create_Cable));
+	mTools.push_back(					new WED_CreateLineTool("Sealane", mMap, mMap, resolver, archive, create_Sealane));
 
 	mTools.push_back(					new WED_VertexTool("Vertex",mMap, mMap, resolver, 1));
 	mTools.push_back(					new WED_MarqueeTool("Marquee",mMap, mMap, resolver));
@@ -301,8 +303,10 @@ WED_MapPane::WED_MapPane(GUI_Commander * cmdr, double map_bounds[4], IResolver *
 	if(*t)
 		mMap->AddLayer(*t);
 
-	mMap->SetTool(mTools[0]);
-	mInfoAdapter->SetTool(mTools[0]);
+	// ACT: slot 0 now holds the Arrester Cable tool, so start with no active creation
+	// tool selected (was SetTool(mTools[0]) back when slot 0 was the empty NULL slot).
+	mMap->SetTool(NULL);
+	mInfoAdapter->SetTool(NULL);
 	mToolbar->SetValue(mTools.size()-2);
 
 	// This is a bit of a hack.  The archive provides whole-doc "changed" messages at the minimum global times:
